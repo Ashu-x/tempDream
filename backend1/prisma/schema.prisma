@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Dreamers {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  author_Dreams Dreams[]
+}
+
+model Dreams {
+  dream_id               Int                   @id @default(autoincrement())
+  title                  String
+  is_anonymous           Boolean               @default(false)
+  dreamer_id             Int
+  dreamer                Dreamers              @relation(fields: [dreamer_id], references: [id])
+  dream_content          String
+  real_life_context      String
+  dreamer_interpretation String?
+  view_count             Int                   @default(0)
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+  search_vector          Unsupported("tsvector")?
+
+  @@index([search_vector], type: Gin, map: "dreams_search_vector_idx")
+}
